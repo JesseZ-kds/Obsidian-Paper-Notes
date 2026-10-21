@@ -1,0 +1,1009 @@
+/* =====================================================================
+   LINED PAPER (handwritten)  —  Obsidian CSS snippet
+   =====================================================================
+   FULL DOCS   README.md in the repo root (docs/SETTINGS.md lists every setting)
+
+   INSTALL   Save as  <vault>/.obsidian/snippets/lined-paper.css
+             then Settings → Appearance → CSS snippets → switch it on.
+   USE       Add this to a note's properties:   cssclasses: lined-paper
+             (add  cornell  as well for Cornell notes — see cornell-notes.css)
+   Only notes with that class are changed; every other note is untouched.
+
+   CHANGE SETTINGS  — two ways, both change the same thing:
+     A) EASY: install the "Style Settings" community plugin. Everything below
+        appears under  Settings → Style Settings → Lined Paper  (sliders,
+        colour pickers, text boxes). No CSS editing needed.
+     B) MANUAL: edit the fallback value in section 1 ("SETTINGS"), e.g.
+        change  var(--lp-line, 36px)  to  var(--lp-line, 32px).
+
+   CONTENTS  0 Style Settings · 1 Settings · 2 Paper · 3 Page layout ·
+             3b Keep-out zone · 4 Date · 5 Body text ·
+             6 Lists/quotes/tables/images · 7 Callouts · 8 Title bar ·
+             9 PDF export · 10 A4 page view (reading view) · 11 A4 geometry (shared by PDF + page view)
+
+   Fonts load from Google Fonts (needs internet); offline it falls back to
+   Segoe Print / Bradley Hand / Chalkboard SE.
+   ===================================================================== */
+
+/* ---------- 0. STYLE SETTINGS (read by the Style Settings plugin) ---------- */
+/* @settings
+
+name: Lined Paper
+id: lined-paper
+settings:
+    -
+        id: lp-h-layout
+        title: Page layout
+        type: heading
+        level: 1
+        collapsed: true
+    -
+        id: lp-line
+        title: Row height
+        description: Height of one ruled line.
+        type: variable-number-slider
+        default: 36
+        min: 24
+        max: 60
+        step: 1
+        format: px
+    -
+        id: lp-text
+        title: Text size
+        type: variable-number-slider
+        default: 22
+        min: 14
+        max: 40
+        step: 1
+        format: px
+    -
+        id: lp-title
+        title: Title size
+        type: variable-number-slider
+        default: 48
+        min: 24
+        max: 80
+        step: 1
+        format: px
+    -
+        id: lp-pad-x
+        title: Page margin (left and right)
+        description: Space from the page edge to the text. The red margin line sits "Margin line gap" to the left of the text.
+        type: variable-number-slider
+        default: 76
+        min: 40
+        max: 200
+        step: 2
+        format: px
+    -
+        id: lp-margin-gap
+        title: Margin line gap
+        description: Distance between the red margin line and the text. Nothing in the note is allowed to go further left than the line.
+        type: variable-number-slider
+        default: 16
+        min: 6
+        max: 40
+        step: 1
+        format: px
+    -
+        id: lp-shift
+        title: Rule line position
+        description: Nudges the ruled lines up (larger) or down (smaller) relative to the text baseline.
+        type: variable-number-slider
+        default: 6
+        min: 0
+        max: 16
+        step: 1
+        format: px
+    -
+        id: lp-callout-lift
+        title: Callout lift
+        description: How far callout boxes (tint and border) sit above their ruled rows, as a share of one row. 0.33 = a third of a row up.
+        type: variable-number-slider
+        default: 0.33
+        min: 0
+        max: 0.5
+        step: 0.01
+    -
+        id: lp-callout-inset
+        title: Callout box inset
+        description: How far the callout box (tint and border) starts below the top of its first row and ends above the bottom of its last row, as a share of one row. 0.33 = a third. Lower it if text pokes out of the box.
+        type: variable-number-slider
+        default: 0.33
+        min: 0
+        max: 0.5
+        step: 0.01
+    -
+        id: lp-callout-text
+        title: Callout text size
+        description: Text inside callouts as a share of the normal text size, so it stays between its two ruled lines instead of touching them.
+        type: variable-number-slider
+        default: 0.9
+        min: 0.6
+        max: 1
+        step: 0.01
+    -
+        id: lp-h-page
+        title: A4 page measurements (PDF + page view)
+        description: "One page = HEADER (title bar) + BODY (question, cues, notes, summary) + FOOTER (blank). Row height = page height used ÷ (header rows + body rows + footer rows), so the three always fit the page. Defaults: 3 + 32 + 0.33 = 35.33 rows, about 8.2mm (31px) each. The reading view uses exactly the same numbers, so it looks like the export."
+        type: heading
+        level: 1
+        collapsed: false
+    -
+        id: lp-print-h
+        title: Page height used
+        description: How much of the A4 page (297mm) the layout fills. Lower it if the last rows spill onto a second page; raise it to use more of the page.
+        type: variable-number-slider
+        default: 290
+        min: 270
+        max: 297
+        step: 1
+        format: mm
+    -
+        id: lp-bar-lines
+        title: Header (title bar) height
+        description: In ruled rows. Whole rows only, so the body text stays on the lines.
+        type: variable-number-slider
+        default: 3
+        min: 2
+        max: 5
+        step: 1
+    -
+        id: lp-body-rows
+        title: Body rows
+        description: "Ruled rows for the writing (the Cornell question, cues, notes and summary all live inside these)."
+        type: variable-number-slider
+        default: 32
+        min: 20
+        max: 48
+        step: 1
+    -
+        id: lp-foot-ratio
+        title: Footer height
+        description: Blank space under the body, as a share of the header height (0.11 = about a ninth, roughly half of the old 1/3 footer; 0.5 = half the header).
+        type: variable-number-slider
+        default: 0.11
+        min: 0
+        max: 1
+        step: 0.01
+    -
+        id: lp-print-scale
+        title: PDF text scale
+        description: Text and title size in the PDF export as a share of the screen size, so the writing fits the smaller PDF rows.
+        type: variable-number-slider
+        default: 0.88
+        min: 0.6
+        max: 1
+        step: 0.01
+    -
+        id: lp-no-pages
+        title: Turn off A4 page view
+        description: Reading view normally shows the note as marginless A4 pages on a desk, with the same row height, text size, header and footer as the PDF export. Switch this on for one full-width sheet with the classic row height / text size settings instead.
+        type: class-toggle
+    -
+        id: lp-desk
+        title: Desk (behind the pages)
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#d9dde3'
+        default-dark: '#0f121a'
+    -
+        id: lp-h-fonts
+        title: Fonts
+        type: heading
+        level: 1
+        collapsed: true
+    -
+        id: lp-hand
+        title: Handwriting font
+        description: A font name, e.g. "Patrick Hand". Must be installed on your device (Patrick Hand and Caveat are downloaded automatically).
+        type: variable-text
+        default: '"Patrick Hand"'
+    -
+        id: lp-hand-title
+        title: Title font
+        type: variable-text
+        default: '"Caveat"'
+    -
+        id: lp-h-colours
+        title: Colours
+        type: heading
+        level: 1
+        collapsed: true
+    -
+        id: lp-paper
+        title: Paper
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#fffffe'
+        default-dark: '#1c2130'
+    -
+        id: lp-rule
+        title: Ruled lines
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#c9ddf1'
+        default-dark: '#2c3650'
+    -
+        id: lp-margin
+        title: Red margin line
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#f1a7b0'
+        default-dark: '#7a4350'
+    -
+        id: lp-bar
+        title: Title bar background
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#fffffe'
+        default-dark: '#1c2130'
+    -
+        id: lp-ink
+        title: Text
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#1f2937'
+        default-dark: '#d6deee'
+    -
+        id: lp-title-ink
+        title: Title text
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#111827'
+        default-dark: '#f1f5ff'
+    -
+        id: lp-muted
+        title: Muted text (date, labels)
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#4b5d85'
+        default-dark: '#93a4cc'
+    -
+        id: lp-pen-red
+        title: Red pen (heading underlines)
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#c0392b'
+        default-dark: '#ff8a7a'
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@600;700&display=swap");
+
+/* ---------- 1. SETTINGS ----------
+   Each line reads:  --name: var(--lp-name, FALLBACK);
+   Style Settings sets --lp-name; if you don't use the plugin, edit FALLBACK. */
+.lined-paper {
+  --line: var(--lp-line, 36px);              /* row height */
+  --shift: var(--lp-shift, 6px);             /* rule position relative to text */
+  --text: var(--lp-text, 22px);              /* body text size */
+  --title: var(--lp-title, 48px);            /* title size */
+  --bar-lines: var(--lp-bar-lines, 3);       /* title bar height, in lines */
+  --pad-x: var(--lp-pad-x, 76px);            /* page edge → text */
+  --margin-gap: var(--lp-margin-gap, 16px);  /* red line → text */
+  --margin-x: calc(var(--pad-x) - var(--margin-gap));   /* where the red line is (derived) */
+
+  --hand: var(--lp-hand, "Patrick Hand"), "Segoe Print", "Bradley Hand", "Chalkboard SE", cursive;
+  --hand-title: var(--lp-hand-title, "Caveat"), "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+
+  /* Colours (light theme) */
+  --paper: var(--lp-paper, #fffffe);
+  --rule: var(--lp-rule, #c9ddf1);
+  --margin: var(--lp-margin, #f1a7b0);
+  --bar: var(--lp-bar, #fffffe);
+  --bar-line: #9cc3e6;
+  --ink: var(--lp-ink, #1f2937);
+  --title-ink: var(--lp-title-ink, #111827);
+  --muted: var(--lp-muted, #4b5d85);
+  --pen-red: var(--lp-pen-red, #c0392b);
+
+  /* Callouts: every box covers a whole number of rows (title row + one row per text line)
+     and is lifted a third of a row toward the top of its line */
+  --callout-lift: var(--lp-callout-lift, 0.33);              /* share of a row */
+  --callout-offset: calc(var(--line) * var(--callout-lift) * -1);
+  --callout-inset: var(--lp-callout-inset, 0.33);            /* box starts/ends this far inside its rows (share of a row) */
+  --callout-inset-px: calc(var(--line) * var(--callout-inset));
+  --callout-text-size: var(--lp-callout-text, 0.9);          /* callout text, share of --text */
+  /* Titles (Cornell Question / Summary): centred between their two ruled lines */
+  --title-nudge: calc(-1 * (var(--shift) + 1px));
+}
+
+/* Colours (dark theme) */
+.theme-dark .lined-paper {
+  --paper: var(--lp-paper, #1c2130);
+  --rule: var(--lp-rule, #2c3650);
+  --margin: var(--lp-margin, #7a4350);
+  --bar: var(--lp-bar, #1c2130);
+  --bar-line: #3f5a85;
+  --ink: var(--lp-ink, #d6deee);
+  --title-ink: var(--lp-title-ink, #f1f5ff);
+  --muted: var(--lp-muted, #93a4cc);
+  --pen-red: var(--lp-pen-red, #ff8a7a);
+}
+
+/* ---------- 2. PAPER ---------- */
+.markdown-source-view.lined-paper .cm-scroller,
+.markdown-preview-view.lined-paper {
+  padding: 0 !important;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right,
+      transparent var(--margin-x),
+      var(--margin) var(--margin-x),
+      var(--margin) calc(var(--margin-x) + 1px),
+      transparent calc(var(--margin-x) + 1px)),
+    repeating-linear-gradient(to bottom,
+      transparent 0,
+      transparent calc(var(--line) - var(--shift) - 1px),
+      var(--rule) calc(var(--line) - var(--shift) - 1px),
+      var(--rule) calc(var(--line) - var(--shift)),
+      transparent calc(var(--line) - var(--shift)),
+      transparent var(--line));
+  background-attachment: local;
+  background-position: 0 0;
+  color: var(--ink);
+  font-family: var(--hand);
+}
+
+/* ---------- 3. PAGE LAYOUT ---------- */
+.lined-paper .cm-sizer,
+.lined-paper .markdown-preview-sizer {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 var(--pad-x) var(--line) !important;
+  box-sizing: border-box;
+}
+
+.lined-paper .cm-content {
+  padding: 0 !important;
+  max-width: none !important;
+}
+
+.lined-paper .markdown-preview-pusher,
+.lined-paper .cm-gutters {
+  display: none;
+}
+
+/* Hide Obsidian's own file-name title */
+.lined-paper .inline-title,
+.lined-paper .frontmatter-container {
+  display: none !important;
+}
+
+/* ---------- 3b. KEEP-OUT ZONE ----------
+   The red margin line is the left edge of the page: nothing may poke out past it.
+   (1) Obsidian's fold arrows sit OUTSIDE the text on the left, so they are hidden.
+       Folding still works from the command palette ("Toggle fold").
+   (2) Safety net: every block is clipped at the margin line, so anything else that
+       sticks out to the left (wide indents, negative margins, plugin widgets) is cut
+       off there instead of spilling over it. Blocks can still be as wide as they
+       like to the right/top/bottom.
+   Exempt: the title bar (and Cornell summary), which are full-width on purpose and
+   redraw the margin line themselves. */
+.lined-paper .heading-collapse-indicator,
+.lined-paper .list-collapse-indicator,
+.lined-paper .cm-fold-indicator {
+  display: none !important;
+}
+
+.markdown-preview-view.lined-paper .markdown-preview-section > div:where(:not(:has(> h1)):not(.metadata-container):not(.frontmatter-container)),
+.markdown-source-view.lined-paper .cm-content > :is(.cm-line, .cm-embed-block):not(.HyperMD-header-1) {
+  clip-path: inset(-9999px -9999px -9999px calc(var(--margin-gap) * -1));
+}
+
+/* ---------- 4. DATE ---------- */
+.lined-paper .metadata-container {
+  position: sticky;
+  top: 6px;
+  z-index: 30;
+  height: 0;
+  overflow: visible;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+.lined-paper .metadata-properties-heading,
+.lined-paper .metadata-add-button,
+.lined-paper .metadata-property:not([data-property-key="date"]) {
+  display: none !important;
+}
+
+.lined-paper .metadata-properties {
+  position: absolute;
+  right: 28px;
+  top: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.lined-paper .metadata-property {
+  display: block;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.lined-paper .metadata-property-key,
+.lined-paper .metadata-property-icon {
+  display: none !important;
+}
+
+.lined-paper .metadata-property-value {
+  padding: 0;
+  min-height: 0;
+}
+
+.lined-paper .metadata-property-value input,
+.lined-paper .metadata-property-value .metadata-input-longtext {
+  font-family: var(--hand);
+  font-size: 20px;
+  line-height: var(--line);
+  height: var(--line);
+  padding: 0;
+  color: var(--muted);
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-align: right;
+}
+
+/* ---------- 5. BODY TEXT ---------- */
+.lined-paper .cm-line,
+.lined-paper p,
+.lined-paper li,
+.lined-paper blockquote,
+.lined-paper h2,
+.lined-paper h3,
+.lined-paper h4,
+.lined-paper h5,
+.lined-paper h6,
+.lined-paper td,
+.lined-paper th,
+.lined-paper pre,
+.lined-paper code {
+  font-family: var(--hand);
+  font-size: var(--text) !important;
+  line-height: var(--line) !important;
+  text-align: left;
+  color: var(--ink);
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  letter-spacing: 0.01em;
+}
+
+/* HTML alignment */
+.lined-paper :is(p, div, h2, h3, h4, h5, h6, li)[align="right"] {
+  text-align: right !important;
+}
+
+.lined-paper :is(p, div, h2, h3, h4, h5, h6, li)[align="center"] {
+  text-align: center !important;
+}
+
+.lined-paper :is(p, div, h2, h3, h4, h5, h6, li)[align="left"] {
+  text-align: left !important;
+}
+
+.lined-paper :is(p, div, h2, h3, h4, h5, h6, li)[align="justify"] {
+  text-align: justify !important;
+}
+
+/* Sub-headings */
+.lined-paper h2,
+.lined-paper h3,
+.lined-paper h4,
+.lined-paper h5,
+.lined-paper h6,
+.lined-paper .cm-header-2,
+.lined-paper .cm-header-3,
+.lined-paper .cm-header-4,
+.lined-paper .cm-header-5,
+.lined-paper .cm-header-6 {
+  font-size: var(--text) !important;
+  line-height: var(--line) !important;
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: var(--pen-red);
+  text-underline-offset: 5px;
+}
+
+.lined-paper strong,
+.lined-paper .cm-strong {
+  font-weight: 400;
+  text-shadow: 0.5px 0 0 currentColor, -0.5px 0 0 currentColor;
+}
+
+/* Italics: a real slant. (The old wavy underline sat exactly on the ruled line, so it got lost.) */
+.lined-paper em,
+.lined-paper .cm-em {
+  font-style: italic;
+  font-synthesis: style;      /* the handwriting font has no italic, so the browser slants it */
+  text-decoration: none;
+}
+
+/* ---------- 6. LISTS, QUOTES, TABLES, IMAGES ---------- */
+.lined-paper ul,
+.lined-paper ol {
+  margin: 0 !important;
+  padding-inline-start: 1.4em !important;
+}
+
+.lined-paper li {
+  list-style-position: outside;
+}
+
+.lined-paper blockquote {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.lined-paper pre {
+  background: none !important;
+}
+
+.lined-paper hr {
+  height: var(--line);
+  margin: 0 !important;
+  border: none;
+  background: none;
+}
+
+.lined-paper input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+/* Grid safety */
+.lined-paper li,
+.lined-paper li > p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.lined-paper sub,
+.lined-paper sup {
+  line-height: 0;
+}
+
+.lined-paper :is(strong, em, a, mark, del, u, code, .math, mjx-container) {
+  line-height: inherit;
+}
+
+.lined-paper pre {
+  padding: 0 !important;
+  margin: 0 !important;
+  white-space: pre-wrap;
+}
+
+.lined-paper table {
+  border-collapse: collapse;
+  border: none;
+  margin: 0;
+}
+
+.lined-paper th,
+.lined-paper td {
+  height: var(--line);
+  padding: 0 12px !important;
+  border: none !important;
+  vertical-align: top;
+  text-align: left;
+}
+
+.lined-paper img {
+  display: block;
+  height: calc(var(--line) * 6);
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left top;
+}
+
+.lined-paper img {
+  margin: 0 !important;
+  position: static !important;
+}
+
+.lined-paper .image-embed,
+.lined-paper p:has(> img) {
+  display: block !important;
+  box-sizing: content-box !important;
+  padding: calc(var(--line) / 2) 0 !important;
+  margin: 0 !important;
+  line-height: 0 !important;
+}
+
+/* Images inside a callout move with the callout */
+.lined-paper .callout .image-embed,
+.lined-paper .callout p:has(> img) {
+  padding: 0 !important;
+}
+
+/* ---------- 7. CALLOUTS ----------
+   Obsidian's own callout colours, icons AND background are used (the default
+   translucent tint, so the ruled lines show through). Every callout is exactly a
+   whole number of rows tall (one title row + one row per line of text) and the
+   whole row block is lifted --callout-lift (a third of a row) toward the top of its line.
+   Row height is always --line; only the text size inside changes. */
+.lined-paper .callout.callout {
+  /* Obsidian's own callout background (callout colour at 10%, its own blend mode) is left
+     alone, so callouts look exactly like Obsidian's default. Only the rows are fixed. */
+  box-sizing: border-box;
+  top: var(--callout-offset);
+  margin-block: 0 var(--line) !important;
+  padding: 0 12px 0 16px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+/* A callout inside a callout rides on its parent's lift (no second shift), and the last one
+   leaves no extra blank row, so the gap to whatever follows stays ONE row, not two. */
+.lined-paper .callout .callout { top: 0; }
+.lined-paper .callout-content > .callout:last-child,
+.lined-paper .callout-content > blockquote:last-child > .callout:last-child { margin-block-end: 0 !important; }
+
+/* No custom box: Obsidian draws the callout background itself */
+.lined-paper .callout::before { content: none; }
+
+.lined-paper .callout-title {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--line);
+  min-height: var(--line);
+  padding: 0 !important;
+  font-size: calc(var(--text) * var(--callout-text-size));
+  line-height: var(--line);
+  /* titles are centred between their two ruled lines: undo the callout's lift, then
+     move up half the gap to the rule (the rules sit --shift + 1px above the row bottom) */
+  position: relative;
+  top: calc(var(--callout-offset) * -1 - var(--shift) - 1px);
+}
+
+/* Title = exactly one line */
+.lined-paper .callout-title-inner {
+  font-size: calc(var(--text) * var(--callout-text-size));
+  line-height: var(--line);
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lined-paper .callout-icon,
+.lined-paper .callout-fold {
+  display: flex;
+  align-items: center;
+  height: var(--line);
+}
+
+.lined-paper .callout-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Callout text is a little smaller than body text so the whole letters (tops and tails)
+   stay inside their ruled row instead of touching the lines. Row height is unchanged. */
+.lined-paper .callout :is(p, li, td, th, pre, code, h2, h3, h4, h5, h6) {
+  font-size: calc(var(--text) * var(--callout-text-size)) !important;
+}
+
+.lined-paper .cm-callout,
+.lined-paper .cm-embed-block.cm-callout {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ---------- 8. TITLE BAR ---------- */
+.lined-paper h1,
+.lined-paper .HyperMD-header-1 {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: block;
+  box-sizing: border-box;
+  height: calc(var(--line) * var(--bar-lines));
+  margin: 0 calc(var(--pad-x) * -1) !important;
+  padding: 0 200px 0 var(--pad-x) !important;
+  line-height: calc(var(--line) * (var(--bar-lines) - 0.4)) !important;
+  background-color: var(--bar);
+  background-image:
+    linear-gradient(to right,
+      transparent var(--margin-x),
+      var(--margin) var(--margin-x),
+      var(--margin) calc(var(--margin-x) + 1px),
+      transparent calc(var(--margin-x) + 1px)),
+    linear-gradient(to bottom,
+      transparent 0,
+      transparent calc(100% - 7px),
+      var(--rule) calc(100% - 7px),
+      var(--rule) calc(100% - 5px),
+      transparent calc(100% - 5px),
+      transparent calc(100% - 2px),
+      var(--rule) calc(100% - 2px),
+      var(--rule) 100%);
+  border: none !important;
+  box-shadow: 0 6px 8px -6px rgba(31, 41, 55, 0.2);
+  font-family: var(--hand-title);
+  font-size: var(--title) !important;
+  font-weight: 700;
+  text-align: left;
+  color: var(--title-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Date: top right corner */
+.lined-paper .paper-date {
+  position: absolute;
+  right: 28px;
+  top: 6px;
+  font-family: var(--hand);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: var(--line);
+  color: var(--muted);
+}
+
+/* ---------- 9. PDF EXPORT ----------
+   Obsidian: ⋯ menu (or right-click the note) → Export to PDF, then choose
+   Page size: A4  and  Margin: None.   Tip: export from the LIGHT theme.
+
+   On screen the ruled lines are a background on a scrolling box, the title bar is
+   sticky and the Cornell summary is pinned. That doesn't survive printing, so:
+     • the paper (ruled lines + red margin line [+ Cornell divider]) becomes a
+       FIXED layer, which the browser repeats on every page and restarts at each
+       page's top, so the lines always sit under the text rows;
+     • sticky / pinned / flex / scroll behaviour becomes normal flowing content;
+     • backgrounds are forced to print;
+     • callouts, images, tables and Cornell groups never split across pages. */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  .lined-paper,
+  .lined-paper * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* (the PDF row height / footer size are set in the last block of this file, so they come
+     after section 10 and win) */
+
+  /* The page margins live on the note container itself: Obsidian's export doesn't
+     always keep the inner .markdown-preview-sizer, so padding there got lost. */
+  .markdown-preview-view.lined-paper {
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
+    width: 100% !important;
+    height: auto !important;
+    min-height: calc(var(--print-h) - 1px) !important;   /* one full page, so the footer / summary sit at its bottom */
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 var(--pad-x) calc(var(--line) * var(--foot-rows)) !important;
+    background: var(--paper) !important;   /* plain colour; the lines are the fixed layer below */
+  }
+
+  .lined-paper .markdown-preview-sizer {
+    display: block !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .lined-paper .markdown-preview-section {
+    display: flow-root;
+  }
+
+  /* The paper layer. Fixed = repeated on every page, anchored to each page's top.
+     Built from opaque / solid layers only: gradients that fade to "transparent"
+     print with dark fringes in PDF. */
+  .markdown-preview-view.lined-paper::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Ruled rows are drawn ONLY over header + body (the footer and the few mm left under it
+       stay blank paper on EVERY page). The red margin line runs the full sheet.
+       background-color matters: without it the strip under the used page height printed white. */
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--margin), var(--margin)),
+      repeating-linear-gradient(to bottom,
+        var(--paper) 0,
+        var(--paper) calc(var(--line) - var(--shift) - 1px),
+        var(--rule) calc(var(--line) - var(--shift) - 1px),
+        var(--rule) calc(var(--line) - var(--shift)),
+        var(--paper) calc(var(--line) - var(--shift)),
+        var(--paper) var(--line));
+    background-size: 1px 100%, 100% calc(var(--print-h) - var(--line) * var(--foot-rows));
+    background-position: var(--margin-x) 0, 0 0;
+    background-repeat: no-repeat, no-repeat;
+  }
+
+  /* Title bar: flows at the top of page 1 (relative, not static, so the Cornell
+     column labels positioned inside it stay put). Same look, solid layers. */
+  .markdown-preview-view.lined-paper h1 {
+    position: relative !important;
+    box-shadow: none !important;
+    background-image:
+      linear-gradient(var(--margin), var(--margin)),
+      linear-gradient(var(--rule), var(--rule)),
+      linear-gradient(var(--rule), var(--rule)) !important;
+    background-size: 1px 100%, 100% 2px, 100% 2px !important;
+    background-position: var(--margin-x) 0, 0 calc(100% - 7px), 0 100% !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* Footer: blank space just under the body (and under the Cornell summary), --foot-ratio
+     of the header height. Blank paper (the red margin line carries on), opaque, so the
+     ruled lines and the Cornell divider stop above it. */
+  .markdown-preview-view.lined-paper::after {
+    content: "";
+    position: absolute;
+    z-index: 14;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(var(--line) * var(--foot-rows));
+    pointer-events: none;
+    background:
+      linear-gradient(var(--margin), var(--margin)) var(--margin-x) 0 / 1px 100% no-repeat,
+      var(--paper);
+  }
+
+  .lined-paper .metadata-container {
+    position: relative;
+  }
+
+  .lined-paper .markdown-preview-section > div {
+    clip-path: none !important;
+  }
+
+  .lined-paper :is(h2, h3, h4, h5, h6) {
+    break-after: avoid;
+  }
+
+  .lined-paper :is(.callout, pre, table, img, .image-embed, blockquote) {
+    break-inside: avoid;
+  }
+
+  .lined-paper :is(p, li) {
+    orphans: 2;
+    widows: 2;
+  }
+}
+
+/* ---------- 10. A4 PAGE VIEW (reading view, on screen only) ----------
+   Reading view shows the note as the SAME A4 sheet the PDF export prints: same row height,
+   text and title size, same header (title bar), same blank footer, same 210mm width. The
+   numbers come from section 11, which both the export and this view use.
+   One sheet = header rows + --body-rows rows of writing + a blank footer, on a grey desk.
+   When the note is longer than one sheet, the next sheet follows after a thin seam. As in the
+   PDF, the footer of every sheet is blank paper (no ruled rows).
+   Limits of pure CSS: CSS can't push text past a page break or keep text out of a page's
+   footer, and it can't repeat the note's title on pages 2+. Turn the whole view off in Style
+   Settings ("Turn off A4 page view") or delete this section. Printing / PDF export ignores it. */
+.lined-paper {
+  --body-rows: var(--lp-body-rows, 32);              /* rows for the writing (not title bar, not footer) */
+  --foot-ratio: var(--lp-foot-ratio, 0.11);          /* footer height, as a share of the header (title bar) height */
+  --foot-rows: calc(var(--bar-lines) * var(--foot-ratio));
+  --page-rows: calc(var(--bar-lines) + var(--body-rows) + var(--foot-rows));
+  --print-h: var(--lp-print-h, 290mm);               /* page height the layout fills (A4 = 297mm) */
+  --print-scale: var(--lp-print-scale, 0.88);        /* text + title size on the A4 sheet vs. the classic size */
+  --sheet-w: 210mm;
+  --page-h: calc(var(--line) * 36);                  /* one sheet on screen = whole rows (fallback; exact value below) */
+  --body-end: calc(var(--line) * (var(--bar-lines) + var(--body-rows)));   /* where the writing area ends, from the sheet top */
+  --tail-h: calc(var(--page-h) - var(--body-end));   /* blank footer + leftover strip under the writing area */
+  --desk: var(--lp-desk, #d9dde3);
+}
+.theme-dark .lined-paper { --desk: var(--lp-desk, #0f121a); }
+
+@supports (width: round(up, 1px, 1px)) {
+  .lined-paper { --page-h: calc(var(--line) * round(up, var(--page-rows), 1)); }
+}
+
+@media screen {
+  body:not(.lp-no-pages) .markdown-reading-view:has(.markdown-preview-view.lined-paper) {
+    background-color: var(--desk);
+  }
+
+  /* the sheet: A4 wide, centred */
+  body:not(.lp-no-pages) .markdown-reading-view .markdown-preview-view.lined-paper {
+    width: min(var(--sheet-w), 100%);
+    margin: 0 auto;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 6px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  /* the first sheet is always a full sheet */
+  body:not(.lp-no-pages) .markdown-reading-view .markdown-preview-view.lined-paper .markdown-preview-sizer {
+    position: relative;
+    isolation: isolate;
+    min-height: var(--page-h) !important;
+  }
+
+  /* Blank footer of every sheet, drawn BEHIND the text (z-index -1). It starts where the
+     writing area ends and repeats every sheet:
+       blank paper  : footer + leftover strip (no ruled rows, red margin line carries on)
+       seam         : thin desk strip, only drawn where another sheet follows */
+  body:not(.lp-no-pages) .markdown-reading-view .markdown-preview-view.lined-paper .markdown-preview-sizer::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    top: var(--body-end);
+    bottom: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to bottom, var(--margin) 0, var(--margin) var(--tail-h), transparent var(--tail-h)),
+      repeating-linear-gradient(to bottom,
+        var(--paper) 0, var(--paper) var(--tail-h),
+        rgba(0, 0, 0, 0.3) var(--tail-h), rgba(0, 0, 0, 0.3) calc(var(--tail-h) + 1px),
+        var(--desk) calc(var(--tail-h) + 1px), var(--desk) calc(var(--tail-h) + 3px),
+        rgba(0, 0, 0, 0.3) calc(var(--tail-h) + 3px), rgba(0, 0, 0, 0.3) calc(var(--tail-h) + 4px),
+        transparent calc(var(--tail-h) + 4px), transparent var(--page-h));
+    background-size: 1px var(--page-h), 100% 100%;
+    background-position: var(--margin-x) 0, 0 0;
+    background-repeat: repeat-y, no-repeat;
+  }
+}
+
+
+/* ---------- 11. A4 GEOMETRY (shared by the PDF export and the reading-view page; must stay LAST) ----------
+   THE PAGE BUDGET. One A4 page is split into three parts, all measured in rows:
+       header  = --bar-lines                       (title bar, with the Cues | Notes labels for Cornell)
+       body    = --body-rows                       (question, cues, notes, summary)
+       footer  = --bar-lines x --foot-ratio        (blank)
+   Row height = --print-h / (header + body + footer rows), so the three always add up to
+   --print-h, a little under 297mm because Obsidian's export wraps the note in a few pixels
+   of its own (if the last rows still spill onto page 2, lower "Page height used" in Style
+   Settings). Defaults: 3 + 32 + 0.33 = 35.33 rows, 290mm / 35.33 = 8.2mm (31px) per row.
+   Text and title shrink with the rows (--print-scale).
+   The PDF always uses this. The reading view uses it too, unless "Turn off A4 page view" is on. */
+@media print {
+  .lined-paper {
+    --line: calc(var(--print-h) / var(--page-rows));
+    --text: calc(var(--lp-text, 22px) * var(--print-scale));
+    --title: calc(var(--lp-title, 48px) * var(--print-scale));
+  }
+}
+@media screen {
+  body:not(.lp-no-pages) .lined-paper {
+    --line: calc(var(--print-h) / var(--page-rows));
+    --text: calc(var(--lp-text, 22px) * var(--print-scale));
+    --title: calc(var(--lp-title, 48px) * var(--print-scale));
+  }
+}
