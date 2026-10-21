@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Obsidian workspace state (only the snippets are tracked, from /snippets)
+.obsidian/workspace*.json
+.obsidian/cache
+
+# Build output
+*.zip
