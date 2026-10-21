@@ -20,7 +20,7 @@ Turn any [Obsidian](https://obsidian.md) note into handwritten-style **ruled pap
 **Option A: installer (recommended)**
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/obsidian-lined-paper.git
+git clone https://github.com/JesseZ-kds/obsidian-paper-notes.git
 cd obsidian-lined-paper
 
 # macOS / Linux
